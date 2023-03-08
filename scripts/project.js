@@ -276,10 +276,10 @@ function updateValue(e) {
 	if (!Number.isInteger(inputvalue) || inputvalue >=10 || inputvalue < 0) {
 		//notice user wrong entered data
 		alert("Veuillez entrer un nombre entier inférieur à 10");
-		//put back input value to 0
-		e.target.value = "0";
+		e.target.value = "0"; //put back input value to 0
 		//indicate user what to do using button tittle property
 		button.title = "choisir d'abord le nombre souhaité pour cet article";
+		button.style.opacity = 0.25; // let button opacity in 0.25
 	} else if (inputvalue > 0){ // when input value is correct
 		//put button opacity to 1
 		button.style.opacity = 1;

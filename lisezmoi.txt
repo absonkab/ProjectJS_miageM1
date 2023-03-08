@@ -15,14 +15,8 @@ Quelques fonctionnalitées ont été ajoutées en guise d'amélioration à savoi
 
 	- La gestion des erreurs de saisies avec les fonctions alert(), confirm() et prompt().
 
-	- L'ajout d'un boutton "tout supprimer" qui permet de supprimer tout le panier en un click. Ceci a nécessité une
-	  fonction addDeleteAllButton() qui est appelé dans la fonction init et qui comporte un click evenlistener qui 
-	  déclenche la fonction deleteAll().
+	- L'ajout d'un boutton "tout supprimer" qui permet de supprimer tout le panier en un click. Ceci a nécessité 	  une fonction addDeleteAllButton() qui est appelé dans la fonction init et qui comporte un click 	  		  evenlistener qui déclenche la fonction deleteAll().
 	
-	- L'ajout d'un bouton "changer de catalogue" qui permet de switcher entre les 2 catalogues fournis. Ceci a nécessité
-	  une fonction addChangeCatalogButton() appelé dans init() et qui permet l'ajout du bouton sur l'écran. Ce bouton
-	  possède un evenlistener qui déclenche la fonction changeCatalog() au click. La fonction changeCatalog() à son tour
-	  supprime l'actuel catalogue et en recontruit un nouveau avec l'autre catalogue. Le changement du catalogue entraîne
-	  la perte du contenu du panier. 
+	- L'ajout d'un bouton "changer de catalogue" qui permet de switcher entre les 2 catalogues fournis. Ceci a 	   	  nécessité une fonction addChangeCatalogButton() appelé dans init() et qui permet l'ajout du bouton sur 	 	  l'écran. Ce bouton possède un evenlistener qui déclenche la fonction changeCatalog() au click. La fonction 	  changeCatalog() à son tour supprime l'actuel catalogue et en recontruit un nouveau avec l'autre catalogue. 	  Le changement du catalogue entraîne la perte du contenu du panier. 
 
-	- Mise en ligne du site. Atteignanble avec l'adresse suivante: https://maboutiqueenligne.netlify.app/
+	- Mise en ligne du site. Joignable sur l'adresse suivante: https://maboutiqueenligne.netlify.app/
