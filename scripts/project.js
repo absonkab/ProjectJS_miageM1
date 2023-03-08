@@ -31,8 +31,9 @@ var init = function () {
 	if (choice) {
 		createShop(choice);	// from line 60
 	} else {					//else call createshop function with the catalog 1
-		localStorage.setItem("choice",1); // define choice value in localStorage
-		createShop(1);
+		choice = 1;
+		localStorage.setItem("choice",choice); // define choice value in localStorage
+		createShop(choice); console.log(localStorage);
 	}
 	addChangeCatalogButton(); // from line 181. A button to switch catalogs
 	addDeleteAllButton(); // from the line 247. A button to delete in one time all the basket content
@@ -42,7 +43,6 @@ var init = function () {
 		chargeBasket(); // charge it. From line 581
 	}
 	
-	//localStorage.clear();
 	// TODO : add other initializations to achieve if you think it is required
 }
 window.addEventListener("load", init);
@@ -226,7 +226,7 @@ function changeCatalog() {
 		total = 0; // reset basket amount to 0
 		document.getElementById("montant").innerHTML = total; // write the new total value
 		localStorage.clear(); // clear all local storage items
-
+		console.log(choice, localStorage);
 		//change the catalog content
 		if (choice == 1) {
 			choice++; // put choice to 2 for next change

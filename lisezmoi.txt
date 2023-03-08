@@ -6,7 +6,8 @@ Quelques fonctionnalitées ont été ajoutées en guise d'amélioration à savoi
 	
 	- L'ajout d'un bouton de modification de la quantité sur chaque produit présent dans le panier.
 	  Ceci a nécessité un ajout de code CSS (boutton.modifier ligne 152), une image importé dans le dossier 
-	  style/images, et un script js dans le fichier scripts/project.js, principalement la fonction updatequantite(e).
+	  style/images, et un script js dans le fichier scripts/project.js, principalement la fonction 
+	  updatequantite(e).
 
 	- L'utilisation de localStorage de javascript afin d'enregister, à chaque ajout au panier, les indices de 
 	  produits comme clé et leur quantité comme valeurs. Ces enregistrements permettent de reconstituer le 
