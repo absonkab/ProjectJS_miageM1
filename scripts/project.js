@@ -116,7 +116,6 @@ var createBlock = function (tag, content, cssClass) {
 /*
 * builds the control element (div.controle) for a product
 * @param index = the index of the considered product
-*
 * TODO : add the event handling, 
 *   /!\  in this version button and input do nothing  /!\  
 */
@@ -143,8 +142,9 @@ var createOrderControlBlock = function (index) {
 	// add control to control as its child
 	control.appendChild(button);
 
-	// add eventlistener to input for handling a value change
-	input.addEventListener('input', updateValue);
+	// add eventlistener to input to handle input and keyups
+	input.addEventListener('input', controleInput);
+	input.addEventListener('keyup', controleInput);
 
 	// add eventlistener on button for handling a click
 	button.addEventListener('click', addtobasket);
@@ -208,37 +208,52 @@ function addChangeCatalogButton() {
 */
 function changeCatalog() {
 
-	if (confirm("Attention !! vous perdrez votre panier actuel. \n Voulez vous continuer ?")) {
-		let boutique = document.getElementById("boutique"); // get div#boutique element
-		let block_achats = document.getElementsByClassName("achats")[0]; //get basket tag
-		let children = boutique.childNodes; // get all children of div#boutique
-		let basketChildren = block_achats.childNodes; // get all children of the basket
+	Swal.fire({
+		title: 'Attention !!',
+		text: "vous perdrez votre panier actuel.",
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: 'Oui, changer!'
+	  }).then((result) => {
+		if (result.isConfirmed) {
+			let boutique = document.getElementById("boutique"); // get div#boutique element
+			let block_achats = document.getElementsByClassName("achats")[0]; //get basket tag
+			let children = boutique.childNodes; // get all children of div#boutique
+			let basketChildren = block_achats.childNodes; // get all children of the basket
 
-		//delete all the products
-		for (let index = 0; index < children.length; index+1) { //loop through
-			children[index].remove();
-		}
+			//delete all the products
+			for (let index = 0; index < children.length; index+1) { //loop through
+				children[index].remove();
+			}
 
-		//delete all the products in the basket
-		for (let index = 0; index < basketChildren.length; index+1) { //loop through
-			basketChildren[index].remove();
+			//delete all the products in the basket
+			for (let index = 0; index < basketChildren.length; index+1) { //loop through
+				basketChildren[index].remove();
+			}
+			total = 0; // reset basket amount to 0
+			document.getElementById("montant").innerHTML = total; // write the new total value
+			localStorage.clear(); // clear all local storage items
+			console.log(choice, localStorage);
+			//change the catalog content
+			if (choice == 1) {
+				choice++; // put choice to 2 for next change
+				createShop(choice); // create shop with the catalog 2
+				localStorage.setItem("choice",choice); //set the first index of localStorage with choice value
+			} else {
+				choice--; // reset choice to 1 for next change
+				createShop(choice); // create shop with catalog 1
+				localStorage.setItem("choice",choice);//set the first index of localStorage with choice value
+			}
+
+			Swal.fire(
+				'Réussi!',
+				'Catalogue changé',
+				'success'
+			)
 		}
-		total = 0; // reset basket amount to 0
-		document.getElementById("montant").innerHTML = total; // write the new total value
-		localStorage.clear(); // clear all local storage items
-		console.log(choice, localStorage);
-		//change the catalog content
-		if (choice == 1) {
-			choice++; // put choice to 2 for next change
-			createShop(choice); // create shop with the catalog 2
-			localStorage.setItem("choice",choice); //set the first index of localStorage with choice value
-		} else {
-			choice--; // reset choice to 1 for next change
-			createShop(choice); // create shop with catalog 1
-			localStorage.setItem("choice",choice);//set the first index of localStorage with choice value
-		}
-	}
-	
+	})
 }
 
 /*
@@ -265,7 +280,7 @@ function addDeleteAllButton() {
 * receive an event and make active or not the associated button
 * @param e (event caught) 
 */
-function updateValue(e) {
+function controleInput(e) {
 	//assure the input value is an integer
 	inputvalue = parseInt(e.target.value);
 	//get the input id
@@ -275,7 +290,12 @@ function updateValue(e) {
 	//Change button opacity depending to the input value
 	if (!Number.isInteger(inputvalue) || inputvalue >=10 || inputvalue < 0) {
 		//notice user wrong entered data
-		alert("Veuillez entrer un nombre entier inférieur à 10");
+		Swal.fire({
+			icon: 'error',
+			title: 'ATTENTION !!',
+			text: 'Veuillez entrer un nombre entier inférieur à 10',
+			footer: ''
+		});
 		e.target.value = "0"; //put back input value to 0
 		//indicate user what to do using button tittle property
 		button.title = "choisir d'abord le nombre souhaité pour cet article";
@@ -331,7 +351,12 @@ function addtobasket(e) {
 				//verify if the new quantity after adding the product is over 9
 				if (quantity > MAX_QTY) {
 					//notice the user that he can't put in more than 9
-					alert("Désolé!! Vous ne pouvez pas commander plus de "+MAX_QTY+" "+ catalog[idx].name);
+					Swal.fire({
+						icon: 'error',
+						title: 'Oops...',
+						text: 'Vous ne pouvez pas commander plus de '+MAX_QTY+" "+catalog[idx].name,
+						footer: ''
+					});
 				} else {
 					//write the new quantity in the quantity div
 					quantity_div.innerHTML = quantity;
@@ -389,12 +414,6 @@ function createBasketBlock(e, achatBlock) {
 	let input = document.getElementById(e.target.id.split("-", 1)[0] + "-" + inputIdKey);
 	//build its value depending whether it exists basket charging event
 	let input_value = parseInt(input.value);
-	/*if (e.detail) {
-		console.log(input_value);
-		//input_value = e.detail;
-		console.log(input_value, e.detail);
-		e.stopPropagation();
-	}*/
 	console.log(input_value);
 	//add div with class "quantite" and write in the input value
 	element.appendChild(createBlock("div", input_value, "quantite"));
@@ -447,11 +466,30 @@ function deleteproduct(e) {
 	let product = catalog[product_index];
 	console.log(product, qte);
 
-	//call total update function
-	basketAmount(qte, product.price, "del");
-	//delete the product from the basket
-	element_to_delete.remove();
-	localStorage.removeItem(product_index);
+	Swal.fire({ // ask confirmation
+		title: 'ATTENTION!!',
+		text: "Cet article sera supprimé !!",
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: 'Oui, supprimer!'
+	}).then((result) => {
+		if (result.isConfirmed) {
+
+			//call total update function
+			basketAmount(qte, product.price, "del");
+			//delete the product from the basket
+			element_to_delete.remove();
+			localStorage.removeItem(product_index);
+
+			Swal.fire(
+			'Supprimé!',
+			'Avec succès',
+			'success'
+			);
+		}
+	});
 }
 
 /*
@@ -463,21 +501,51 @@ function deleteAll() {
 	// First check if block has child nodes
 	if (block_achats.hasChildNodes()) {
 
-		let children = block_achats.childNodes; // get all children
+		let children = block_achats.childNodes; // get all children 
 
-		if (confirm("Etes vous sûr(e) de vouloir vider votre panier ?")) { // ask confirmation
-			for (let index = 0; index < children.length; index+1) { //loop through
-				//delete the product from the basket
-				children[index].remove();
-			}
-			total = 0;
-			document.getElementById("montant").innerHTML = total; // write the new total value
-			localStorage.clear(); // clear all local storage items
-			localStorage.setItem("choice",choice); //set the first index of localStorage with choice value
-		}
+		Swal.fire({ // ask confirmation
+			title: 'Êtes vous sûr(e)?',
+			text: "Cette action est irréversible!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Oui, supprimer!'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				for (var index = 0; index < children.length; index+1) { //loop through
+					//delete the product from the basket
+					children[index].remove();
+				}
+				total = 0;
+				document.getElementById("montant").innerHTML = total; // write the new total value
+				localStorage.clear(); // clear all local storage items
+				localStorage.setItem("choice",choice); //set the first index of localStorage with choice value
+
+				Swal.fire(
+				'Supprimé!',
+				'Votre panier est désormais vide.',
+				'success'
+				);
+			}else {
+				Swal.fire(
+				  'Annulé',
+				  '',
+				  'error'
+				);
+			  }
+		});
 		
 	} else {
-		alert("Votre panier est vide");
+		Swal.fire({
+			title: 'Votre panier est déjà vide',
+			showClass: {
+			  popup: 'animate__animated animate__fadeInDown'
+			},
+			hideClass: {
+			  popup: 'animate__animated animate__fadeOutUp'
+			}
+		});
 	}
 }
 
@@ -490,31 +558,86 @@ function updatequantite(e) {
 	let current_qte = document.getElementById(e.target.id).parentElement.parentElement.querySelector('.quantite').textContent;
 	let product = catalog[parseInt(e.target.id.split("-", 1)[0])]; // get the corresponding product
 	// ask user to enter the new quantity he wants
-	let new_qte = prompt("Saisissez la nouvelle quantité",current_qte);
-	let difference = parseInt(new_qte) - parseInt(current_qte);
-	//let addition = parseInt(current_qte) + parseInt(new_qte);
-	console.log(current_qte, product.price, new_qte);
+	Swal.fire({
+		title: 'Saisissez la nouvelle quantité',
+		input: 'text',
+		inputAttributes: {
+		  autocapitalize: 'off'
+		},
+		showCancelButton: true,
+		confirmButtonText: 'OK',
+		showLoaderOnConfirm: true,
+		preConfirm: (qte) => {
+			return qte;
+		},
+		allowOutsideClick: () => !Swal.isLoading()
+	}).then((result) => {
+		if (result.isConfirmed) {
+			let new_qte = result.value;
+			let difference = parseInt(new_qte) - parseInt(current_qte);
+			//let addition = parseInt(current_qte) + parseInt(new_qte);
+			console.log(current_qte, product.price, new_qte);
 
-	if (new_qte == null) { //if the user cancels, nothing to do
-		console.log("rien a faire...");
-	} else if (difference == 0) { // if the user put in the same quantity, nothing to do
-		console.log("Rien a faire egalement...", difference);
-	} else if (new_qte>MAX_QTY) { // check if the max qte allowed is respected 
-		alert("Désolé!! Vous ne pouvez pas commander plus de "+MAX_QTY+" "+product.name);
-	} else if (new_qte <= 0) { // if new qte entered equal to 0, we delete the corresponding product
-		if (confirm("Cet article sera supprimé !!")) { // ask confirmation before
-			deleteproduct(e);
-		} else {
-			console.log("Rien a faire...");
+			if (new_qte == null) { //if the user cancels, nothing to do
+				console.log("rien a faire...");
+			} else if (difference == 0) { // if the user put in the same quantity, nothing to do
+				console.log("Rien a faire egalement...", difference);
+			} else if (new_qte>MAX_QTY) { // check if the max qte allowed is respected 
+				Swal.fire({
+					icon: 'error',
+					title: 'Oops...',
+					text: 'Vous ne pouvez pas commander plus de '+MAX_QTY+" "+product.name,
+					footer: ''
+				});
+			} else if (new_qte <= 0) { // if new qte entered equal to 0, we delete the corresponding product
+				Swal.fire({ // ask confirmation
+					title: 'ATTENTION!! Nombre négatif!',
+					text: "Cet article sera supprimé !!",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Oui, supprimer!'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						deleteproduct(e);
+						Swal.fire(
+						'Supprimé!',
+						'Avec succès',
+						'success'
+						);
+					}
+				});
+			} else if (0 < new_qte && new_qte <= MAX_QTY) { // if new quantity is correctly entered, update data
+				
+				Swal.fire({
+					title: 'Appliquer le changement?',
+					showDenyButton: true,
+					showCancelButton: false,
+					confirmButtonText: 'Enregistrer',
+					denyButtonText: `Ne pas enregistrer`,
+				}).then((result) => {
+					if (result.isConfirmed) {
+						// write the quantity and update the basket amount
+						document.getElementById(e.target.id).parentElement.parentElement.querySelector('.quantite').innerHTML = new_qte;
+						basketAmount(difference, product.price);
+						Swal.fire('Enregistré!', '', 'success')
+					} else if (result.isDenied) {
+					Swal.fire('Changement abandonné', '', 'info')
+					}
+				});
+
+			} else {
+				Swal.fire({
+					icon: 'error',
+					title: 'Mauvaise saisie !!',
+					text: 'Veuillez entrer des nombres!!',
+					footer: ''
+				});
+			}
 		}
-	} else if (0 < new_qte && new_qte <= MAX_QTY) { // if new quantity is correctly entered, update data
-		
-		document.getElementById(e.target.id).parentElement.parentElement.querySelector('.quantite').innerHTML = new_qte;
-		basketAmount(difference, product.price);
-		console.log("propre propre");
-	} else {
-		alert("Mauvaise saisie !! Veuillez entrer des nombres!!");
-	}
+	});
+	
 }
 
 /*
@@ -547,9 +670,7 @@ function search() {
 	console.log("recherche...");
     input = document.getElementById("filter"); //get input tag of the search bar
     filter = input.value.toUpperCase(); //get the value entered in the search bar
-    //div_achats = document.getElementsByClassName("achats")[0]; // get the div where all ordered products are listed
 	boutique = document.getElementById("boutique"); // get the div boutique where all products are listed
-    //div_achat = div_achats.getElementsByClassName("achat"); // get all children of previous div (every div represent a ordered product) 
     products = boutique.getElementsByClassName("produit"); // get all children of boutique (every child is a product)
 	result_counter = 0; // variable to count how many product match with the research
 
@@ -579,55 +700,46 @@ function search() {
 }
 
 function chargeBasket() {
-	for (let index = 1; index < localStorage.length; index++) { // we start with 1 because the 1st element of local storage is catalog choice value 
+	for (let index = 0; index < localStorage.length; index++) { 
 		let product_idx = localStorage.key(index);
-		let quantite = localStorage.getItem(product_idx);
-		//const element = array[index];
-		/*const event = new CustomEvent("build", { 
-			detail: quantite, 
-			bubbles: false,
-			cancelable: true,
-			composed: false, 
-		});
-		document.getElementById(product_id.toString()+"-"+orderIdKey).dispatchEvent(event);
-		createBasketBlock(event, document.getElementsByClassName("achats")[0]);
-		console.log(product_id,quantite, event.detail);*/
-
-		let basket = document.getElementsByClassName("achats")[0];
-		let product = catalog[product_idx];
-		// create element div with class "achat"
-		let element = createBlock("div", undefined, "achat");
-		//add to the element an id macthing the product linked to the source of the event
-		element.id = product_idx.toString() + "-" + basketIdKey;
-		//create figure element to display the product image
-		let figure = createFigureBlock(product);
-		//add figure to the div
-		element.appendChild(figure);
-		//add h4 tag to the div
-		element.appendChild(createBlock("h4", product.description));
-		//add div with class "quantite" and write in the input value
-		element.appendChild(createBlock("div", quantite, "quantite"));
-		//add div with class "prix" and write in the product price
-		element.appendChild(createBlock("div", product.price, "prix"));
-		//add div with class "controle" and get it
-		let update_div = element.appendChild(createBlock("div", undefined, "controle"));
-		let div = element.appendChild(createBlock("div", undefined, "controle"));
-		//add button with class "modifier" in the update div controle
-		update_button = update_div.appendChild(createBlock("button", undefined, "modifier"));
-		//add button with class "retirer" in the div controle
-		button = div.appendChild(createBlock("button", undefined, "retirer"));
-		//indicate user what the button do using  tittle property
-		update_button.title = "modifier le nombre d'articles";
-		button.title = "supprimer cet article";
-		//add corresponding id to the button
-		button.id = product_idx.toString() + "-" + deleteIdKey;
-		update_button.id = product_idx.toString() + "-" + updateIdKey;
-		// add eventlistener on button for handling a click
-		button.addEventListener('click', deleteproduct);
-		update_button.addEventListener('click', updatequantite);
-		//add element to the basket list
-		basket.appendChild(element);
-		//call total update function
-		basketAmount(quantite, product.price);
+		if (product_idx != 'choice') {
+			let quantite = localStorage.getItem(product_idx);
+			let basket = document.getElementsByClassName("achats")[0];
+			let product = catalog[product_idx];
+			// create element div with class "achat"
+			let element = createBlock("div", undefined, "achat");
+			//add to the element an id macthing the product linked to the source of the event
+			element.id = product_idx.toString() + "-" + basketIdKey;
+			//create figure element to display the product image
+			let figure = createFigureBlock(product);
+			//add figure to the div
+			element.appendChild(figure);
+			//add h4 tag to the div
+			element.appendChild(createBlock("h4", product.description));
+			//add div with class "quantite" and write in the input value
+			element.appendChild(createBlock("div", quantite, "quantite"));
+			//add div with class "prix" and write in the product price
+			element.appendChild(createBlock("div", product.price, "prix"));
+			//add div with class "controle" and get it
+			let update_div = element.appendChild(createBlock("div", undefined, "controle"));
+			let div = element.appendChild(createBlock("div", undefined, "controle"));
+			//add button with class "modifier" in the update div controle
+			update_button = update_div.appendChild(createBlock("button", undefined, "modifier"));
+			//add button with class "retirer" in the div controle
+			button = div.appendChild(createBlock("button", undefined, "retirer"));
+			//indicate user what the button do using  tittle property
+			update_button.title = "modifier le nombre d'articles";
+			button.title = "supprimer cet article";
+			//add corresponding id to the button
+			button.id = product_idx.toString() + "-" + deleteIdKey;
+			update_button.id = product_idx.toString() + "-" + updateIdKey;
+			// add eventlistener on button for handling a click
+			button.addEventListener('click', deleteproduct);
+			update_button.addEventListener('click', updatequantite);
+			//add element to the basket list
+			basket.appendChild(element);
+			//call total update function
+			basketAmount(quantite, product.price);
+		}
 	}
 }
