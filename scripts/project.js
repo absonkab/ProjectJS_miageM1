@@ -16,7 +16,7 @@ var total = 0;
 // variable to control what catalog to use
 var choice = parseInt(localStorage.getItem("choice"));
 
-// global variable catalog used
+// global variable catalog used to contain current catalog(1 or 2)
 var catalog = [];
 
 // function called when page is loaded, it performs initializations 
@@ -36,11 +36,11 @@ var init = function () {
 		createShop(choice); console.log(localStorage);
 	}
 	addChangeCatalogButton(); // from line 181. A button to switch catalogs
-	addDeleteAllButton(); // from the line 247. A button to delete in one time all the basket content
+	addDeleteAllButton(); // from the line 262. A button to delete in one time all the basket content
 
 	// if the basket is not previously empty
-	if (localStorage.length>1) { // we start from 1 because the first index of localStorage is for catalog choice value
-		chargeBasket(); // charge it. From line 581
+	if (localStorage.length>1) { // we use condition >1 because localStorage contains always catalog choice value
+		chargeBasket(); // charge it. From line 702
 	}
 	
 	// TODO : add other initializations to achieve if you think it is required
@@ -208,7 +208,7 @@ function addChangeCatalogButton() {
 */
 function changeCatalog() {
 
-	Swal.fire({
+	Swal.fire({ // ask confirmation
 		title: 'Attention !!',
 		text: "vous perdrez votre panier actuel.",
 		icon: 'warning',
