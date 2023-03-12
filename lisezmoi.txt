@@ -2,20 +2,22 @@ Yacouba Abass KABORE
 
 Toutes les questions ont été traitées convenablement aux exigences.
 
-Quelques fonctionnalitées ont été ajoutées en guise d'amélioration à savoir: 
+Par ailleurs quelques fonctionnalitées ont été ajoutées en guise d'amélioration à savoir: 
 	
 	- L'ajout d'un bouton de modification de la quantité sur chaque produit présent dans le panier.
-	  Ceci a nécessité un ajout de code CSS (boutton.modifier ligne 152), une image importé dans le dossier 
-	  style/images, et un script js dans le fichier scripts/project.js, principalement la fonction 
-	  updatequantite(e).
+	  Ceci a nécessité un ajout de code CSS (boutton.modifier ligne 152), une image de modification importé dans 	  le dossier style/images, et un script js dans le fichier scripts/project.js, principalement la fonction 
+	  updatequantite(e) ligne 556.
 
 	- L'utilisation de localStorage de javascript afin d'enregister, à chaque ajout au panier, les indices de 
 	  produits comme clé et leur quantité comme valeurs. Ces enregistrements permettent de reconstituer le 
-	  contenu du panier à l'aide des indices et quantités associées en parcourant la variable localStorage.
+	  contenu du panier à l'aide des indices et quantités associées en parcourant la variable localStorage. Une
+	  variable 'choice' y est également enregistré afin de savoir quel catalogue charger à chargement de page.
 
-	- La gestion des erreurs de saisies avec les fonctions alert(), confirm() et prompt().
+	- La gestion des erreurs de saisies avec les fonctions la bibliothèque 'sweetalert' ajouté à travers la
+	  balise script dans le fichier index.html line 18.Il convient donc de disposer d'une connection internet 
+	  afin de pouvoir charger le javascript de la bibliothèque dans notre page index.html.
 
-	- L'ajout d'un boutton "tout supprimer" qui permet de supprimer tout le panier en un click. Ceci a nécessité 	  une fonction addDeleteAllButton() qui est appelé dans la fonction init et qui comporte un click 	  		  evenlistener qui déclenche la fonction deleteAll().
+	- L'ajout d'un boutton "tout supprimer" qui permet de supprimer tout le panier en un click. Ceci a nécessité 	  une fonction addDeleteAllButton() qui est appelé dans la fonction init et qui comporte un click 	  		  evenlistener qui déclenche la fonction deleteAll() pour tout supprimer.
 	
 	- L'ajout d'un bouton "changer de catalogue" qui permet de switcher entre les 2 catalogues fournis. Ceci a 	   	  nécessité une fonction addChangeCatalogButton() appelé dans init() et qui permet l'ajout du bouton sur 	 	  l'écran. Ce bouton possède un evenlistener qui déclenche la fonction changeCatalog() au click. La fonction 	  changeCatalog() à son tour supprime l'actuel catalogue et en recontruit un nouveau avec l'autre catalogue. 	  Le changement du catalogue entraîne la perte du contenu du panier. 
 
